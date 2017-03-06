@@ -72,3 +72,4 @@ def consolidatedDetections(detectedRects, similarityThreshold = 0.65, minimumSim
 				if (intersection < intersection_threshold):
 					consolidatedDetections.append(temp[j])
 	return consolidatedDetections
+	
