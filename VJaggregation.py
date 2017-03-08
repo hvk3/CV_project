@@ -1,5 +1,5 @@
-import numpy as np
 import cv2
+import numpy as np
 
 # TODO : For each detection, rotate back the bounding rectangle to be axis aligned if necessary (keeping its center and size constant).
 
@@ -50,7 +50,7 @@ def averageRectangle(detectedRects):
 	width_avg = (width_avg * 1.0) / numRectangles
 	height_avg = (height_avg * 1.0) / numRectangles
 
-	Rectangle avg;
+	avg = Rectangle()
 	avg.setParams(x_avg, y_avg, width_avg, height_avg)
 
 	return avg
@@ -72,4 +72,3 @@ def consolidatedDetections(detectedRects, similarityThreshold = 0.65, minimumSim
 				if (intersection < intersection_threshold):
 					consolidatedDetections.append(temp[j])
 	return consolidatedDetections
-	
