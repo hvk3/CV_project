@@ -1,9 +1,6 @@
 import cv2
 import numpy as np
 
-# TODO : For each detection, rotate back the bounding rectangle to be axis aligned if necessary (keeping its center and size constant).
-
-detections = []
 class Rectangle:
 	def __init__(self):
 		self.lower_left_x = 0
@@ -17,6 +14,8 @@ class Rectangle:
 		self.width = width
 		self.height = height
 		self.area = self.width * self.height
+	def getParams(self):
+		return self.lower_left_x, self.lower_left_y, self.width, self.height
 
 def commonArea(a, b):
 	area = 0
@@ -56,19 +55,26 @@ def averageRectangle(detectedRects):
 	return avg
 
 def consolidatedDetections(detectedRects, similarityThreshold = 0.65, minimumSimilarRectangles = 3, intersectionThreshold = 0.2):
-	similarity, intersection = computeMetrics(detectedRects)
-	numRectangles = len(detectedRects)
-	for i in xrange(numRectangles):
-		temp = []
-		for j in range(numRectangles):
-			if (similarity[i][j] >= similarityThreshold and i != j):
-				temp.append(detectedRects[j])
-		if (len(temp) < count_threshold):
-			temp = []
-		else:
-			R_avg = averageRectangle(temp)
-			for j in xrange(len(temp)):
-				intersection = commonArea(R_avg, temp[j])
-				if (intersection < intersection_threshold):
-					consolidatedDetections.append(temp[j])
-	return consolidatedDetections
+	prevLen = -1
+	while (True):
+		similarity = computeMetrics(detectedRects)
+		i, j = 0, 0
+		while (i < len(detectedRects)):
+			while (j < len(detectedRects)):
+				if (similarity[i][j] < similarityThreshold):
+					detectedRects.pop(j)
+				j += 1
+			i += 1
+			if (len(detectedRects) <= minimumSimilarRectangles):
+				return detectedRects
+			else:
+				R_avg = averageRectangle(detectedRects)
+				while (j < len(detectedRects)):
+					intersection = commonArea(R_avg, detectedRects[j])
+					if (intersection >= intersectionThreshold):
+						detectedRects.pop(j)
+					j += 1
+		if (len(detectedRects) == 0 or prevLen == len(detectedRects)):
+			return detectedRects
+		prevLen = len(detectedRects)
+	return detectedRects
