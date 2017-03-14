@@ -15,7 +15,7 @@ def applyRotation(greyFrame):
 
 def detectFacesInFrames(base, groundTruthVideos, classifiers, featureDescriptors, featureDetectors):
 	videoFiles = sorted(os.listdir(groundTruthVideos))
-	colorFeatures = {0 : (255, 0, 0), 1 : (0, 255, 0), 2 : (0, 0, 255)}
+	rectangleColours = {0 : (255, 0, 0), 1 : (0, 255, 0), 2 : (0, 0, 255)}
 	pwd = os.getcwd() + '/'
 	for videoFile in videoFiles[:1]:
 		whereToDump = 'videoDump/' + videoFile[3:5] + '/'
@@ -39,12 +39,12 @@ def detectFacesInFrames(base, groundTruthVideos, classifiers, featureDescriptors
 							featureRectangle = Rectangle()
 							featureRectangle.setParams(lower_left_x, lower_left_y, width, height)
 							featureRectangles.append(featureRectangle)
-							cv2.rectangle(frame, (lower_left_x, lower_left_y), (lower_left_x + width, lower_left_y + height), colorFeatures[i])
+							cv2.rectangle(frame, (lower_left_x, lower_left_y), (lower_left_x + width, lower_left_y + height), rectangleColours[i])
 			if (len(featureRectangles) > 0):
 				consolidatedRectangles = consolidatedDetections(featureRectangles)
 				print frameCount, len(consolidatedRectangles)
 				for consolidatedRectangle in consolidatedRectangles:
 					lower_left_x, lower_left_y, width, height = map(int, consolidatedRectangle.getParams())
-					cv2.rectangle(frame, (lower_left_x, lower_left_y), (lower_left_x + width, lower_left_y + height), colorFeatures[2])
+					cv2.rectangle(frame, (lower_left_x, lower_left_y), (lower_left_x + width, lower_left_y + height), rectangleColours[2])
 				cv2.imwrite(whereToDump + str(frameCount) + '.bmp', frame)
 			frameCount += 1
