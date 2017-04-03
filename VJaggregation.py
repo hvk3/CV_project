@@ -1,26 +1,27 @@
+import copy
 import cv2
 import numpy as np
 
 class Rectangle:
 	def __init__(self):
-		self.lower_left_x = 0
-		self.lower_left_y = 0
+		self.x = 0
+		self.y = 0
 		self.width = 0
 		self.height = 0
 		self.area = 0
-	def setParams(self, lower_left_x, lower_left_y, width, height):
-		self.lower_left_x = lower_left_x
-		self.lower_left_y = lower_left_y
+	def setParams(self, x, y, width, height):
+		self.x = x
+		self.y = y
 		self.width = width
 		self.height = height
 		self.area = self.width * self.height
 	def getParams(self):
-		return self.lower_left_x, self.lower_left_y, self.width, self.height
+		return self.x, self.y, self.width, self.height
 
 def commonArea(a, b):
 	area = 0
-	width = min(a.lower_left_x + a.height , b.lower_left_x + b.height) - max(a.lower_left_x, b.lower_left_x)
-	height = min(a.lower_left_y + a.width , b.lower_left_y + b.width) - max(a.lower_left_y, b.lower_left_y)
+	width = min(a.x + a.width , b.x + b.width) - max(a.x, b.x)
+	height = min(a.y + a.height, b.y + b.height) - max(a.y, b.y)
 	if (width >= 0 and height >= 0):
 		area = width * height
 	return area
@@ -39,8 +40,8 @@ def averageRectangle(detectedRects):
 	x_avg, y_avg, width_avg, height_avg = 0.0, 0.0, 0.0, 0.0
 	numRectangles = len(detectedRects)
 	for i in xrange(numRectangles):
-		x_avg += detectedRects[i].lower_left_x
-		y_avg += detectedRects[i].lower_left_y
+		x_avg += detectedRects[i].x
+		y_avg += detectedRects[i].y
 		width_avg += detectedRects[i].width
 		height_avg += detectedRects[i].height
 
@@ -55,26 +56,31 @@ def averageRectangle(detectedRects):
 	return avg
 
 def consolidatedDetections(detectedRects, similarityThreshold = 0.65, minimumSimilarRectangles = 3, intersectionThreshold = 0.2):
-	prevLen = -1
+	numRectangles = len(detectedRects)
+	similarity = computeMetrics(detectedRects)
+	similarRectangles = [[] for i in xrange(numRectangles)]
+	combinedRectangles = []
+	finalCombinedRectangles = []
+
+	for i in xrange(numRectangles):
+		R_star = detectedRects[i]
+		similarRectangles.append(R_star)
+		for j in xrange(numRectangles):
+			if (similarity[i][j] >= similarityThreshold):
+				similarRectangles[i].append(detectedRects[j])
 	while (True):
-		similarity = computeMetrics(detectedRects)
-		i, j = 0, 0
-		while (i < len(detectedRects)):
-			while (j < len(detectedRects)):
-				if (similarity[i][j] < similarityThreshold):
-					detectedRects.pop(j)
-				j += 1
-			i += 1
-			if (len(detectedRects) <= minimumSimilarRectangles):
-				return detectedRects
-			else:
-				R_avg = averageRectangle(detectedRects)
-				while (j < len(detectedRects)):
-					intersection = commonArea(R_avg, detectedRects[j])
-					if (intersection >= intersectionThreshold):
-						detectedRects.pop(j)
-					j += 1
-		if (len(detectedRects) == 0 or prevLen == len(detectedRects)):
-			return detectedRects
-		prevLen = len(detectedRects)
-	return detectedRects
+		mostSimilarRectangles_i = np.argmax([len(similarRectangles[i]) for i in xrange(numRectangles)])
+
+		if (len(similarRectangles[mostSimilarRectangles_i]) < minimumSimilarRectangles):
+			return finalCombinedRectangles
+
+		R_avg = averageRectangle(similarRectangles[mostSimilarRectangles_i])
+
+		for i in xrange(len(combinedRectangles)):
+			if (commonArea(R_avg, combinedRectangles[i]) * 1.0 / min(combinedRectangles[i].area, R_avg.area) < intersectionThreshold):
+				print commonArea(R_avg, combinedRectangles[i]) * 1.0 / min(combinedRectangles[i].area, R_avg.area)
+				finalCombinedRectangles.append(combinedRectangles[i])
+
+		similarRectangles[mostSimilarRectangles_i] = []
+		finalCombinedRectangles.append(R_avg)
+		combinedRectangles.append(R_avg)
