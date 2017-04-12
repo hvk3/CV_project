@@ -22,7 +22,7 @@ def detectFacesInFrame(frame, classifiers, featureDescriptors, featureDetectors)
 	rotatedGreyFrames = rotatedFrames(frame)
 	for i in xrange(len(featureDetectors)):
 		for j in xrange(len(rotatedGreyFrames)):
-			features = featureDetectors[i].detectMultiScale(rotatedGreyFrames[j], 1.05, 5)
+			features = featureDetectors[i].detectMultiScale(rotatedGreyFrames[j], 1.02, 3, 5)
 			if (len(features) > 0):
 				for (x, y, width, height) in features:
 					featureRectangle = Rectangle()

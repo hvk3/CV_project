@@ -47,10 +47,10 @@ def getMaskedFrame(frame, groundTruthBoundingBox):
 
 def initialDetections(frame, groundTruthBoundingBox, minDistance = 5):
 	maskedGrayFrame = getMaskedFrame(frame, groundTruthBoundingBox)
-	cv2.imshow('image', maskedGrayFrame)
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()
-	STcorners = cv2.goodFeaturesToTrack(maskedGrayFrame, 100, 0.2, minDistance)
+	# cv2.imshow('image', maskedGrayFrame)
+	# cv2.waitKey(0)
+	# cv2.destroyAllWindows()
+	STcorners = cv2.goodFeaturesToTrack(maskedGrayFrame, 500, 0.2, minDistance)
 
 	return STcorners
 
@@ -117,7 +117,8 @@ def KLTtracker(baseImages, baseDetectedImages):
 
 				STprevPoints[k] = currFrameGoodPoints
 				if (len(currFrameBestPoints) < 3 or len(prevFrameBestPoints) < 3):
-					j -= 1
+					print j
 					continue
 				M = cv2.getAffineTransform(prevFrameBestPoints[:3], currFrameBestPoints[:3])
+				print M
 			prevFrame = currFrame

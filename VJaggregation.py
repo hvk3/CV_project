@@ -64,10 +64,11 @@ def consolidatedDetections(detectedRects, similarityThreshold = 0.65, minimumSim
 
 	for i in xrange(numRectangles):
 		R_star = detectedRects[i]
-		similarRectangles.append(R_star)
+		similarRectangles[i].append(R_star)
 		for j in xrange(numRectangles):
-			if (similarity[i][j] >= similarityThreshold):
+			if (similarity[i][j] >= similarityThreshold and i != j):
 				similarRectangles[i].append(detectedRects[j])
+
 	while (True):
 		mostSimilarRectangles_i = np.argmax([len(similarRectangles[i]) for i in xrange(numRectangles)])
 
