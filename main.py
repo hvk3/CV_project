@@ -4,7 +4,7 @@ import os
 from VJdetection import rotatedFrames, aggregatedDetections
 from basicTracking import detectCameraShots, KLTtracker
 
-base = '/home/hvk/opencv/data/haarcascades/'
+base = '/home/iiitd/opencv/data/haarcascades/'
 groundTruthVideos = 'The Big Bang Theory/'
 baseImages = 'videoDump/01/Ground Truth/'
 baseDetectedImages = 'videoDump/01/VJ aggregated results/'
@@ -19,7 +19,7 @@ def loadFrames(groundTruthVideos):
 	videoFiles = sorted(os.listdir(groundTruthVideos))
 	pwd = os.getcwd() + '/'
 	for videoFile in videoFiles[:1]:
-		whereToDump = 'videoDump/' + videoFile[3:5] + '/'	# In general; otherwise this is the same as baseImages
+		whereToDump = 'videoDump/' + videoFile[3:5] + '/Ground Truth/'	# In general; otherwise this is the same as baseImages
 		videoName = pwd + groundTruthVideos + videoFile
 		video = cv2.VideoCapture(videoName)
 		frameCount = 0
@@ -38,6 +38,6 @@ if __name__ == '__main__':
 	# Generate ground truth frames from video files.
 	# loadFrames(groundTruthVideos)
 	# a) Viola-Jones detection with and without slight rotations.
-	# aggregatedDetections(baseImages, classifiers, featureDescriptors, featureDetectors)
+	aggregatedDetections(baseImages, classifiers, featureDescriptors, featureDetectors)
 	# b) KLT tracking.
-	KLTtracker(baseImages, baseDetectedImages)
+	# KLTtracker(baseImages, baseDetectedImages)

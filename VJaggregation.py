@@ -73,7 +73,14 @@ def consolidatedDetections(detectedRects, similarityThreshold = 0.65, minimumSim
 		mostSimilarRectangles_i = np.argmax([len(similarRectangles[i]) for i in xrange(numRectangles)])
 
 		if (len(similarRectangles[mostSimilarRectangles_i]) < minimumSimilarRectangles):
-			return finalCombinedRectangles
+			temp, toUse = [], [True for i in xrange(len(finalCombinedRectangles))]
+			for i in xrange(len(finalCombinedRectangles)):
+				for j in xrange(len(finalCombinedRectangles)):
+					if (toUse[i] and i != j and commonArea(finalCombinedRectangles[j], finalCombinedRectangles[i])) * 1.0 / min(finalCombinedRectangles[i].area, finalCombinedRectangles[j].area) < intersectionThreshold:
+						temp.append(finalCombinedRectangles[j])
+					else:
+						toUse[j] = False
+			return temp
 
 		R_avg = averageRectangle(similarRectangles[mostSimilarRectangles_i])
 

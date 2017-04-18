@@ -77,7 +77,8 @@ def KLTtracker(baseImages, baseDetectedImages):
 
 	prevShotFrameCount, currShotFrameCount = -1, -1
 	framesDetected = groundTruthBoundingBoxes.keys()
-	
+	import pdb;pdb.set_trace()
+
 	prevShotFrameCount = min(framesDetected)
 	shotBeginEnd = []
 	for detectedFrame in framesDetected:
